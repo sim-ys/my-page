@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>종결예성7의 바닷속 세상</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Font (Jua) -->
+    <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Jua', sans-serif;
+            overflow-x: hidden;
+        }
+        /* Card Flip Styles */
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .transform-style-3d {
+            transform-style: preserve-3d;
+            transition: transform 0.6s ease;
+        }
+        .backface-hidden {
+            backface-visibility: hidden;
+        }
+        .rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+        /* Ocean Background Animation */
+        @keyframes floatBubble {
+            0% { transform: translateY(100vh) scale(0.8); opacity: 0; }
+            50% { opacity: 0.6; }
+            100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
+        }
+        @keyframes swimFish {
+            0% { transform: translateX(-100px) translateY(0); }
+            50% { transform: translateX(calc(100vw + 100px)) translateY(-30px); }
+            100% { transform: translateX(-100px) translateY(0); }
+        }
+        .bubble {
+            position: absolute;
+            bottom: -50px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: floatBubble linear infinite;
+        }
+        .swimming-fish {
+            position: absolute;
+            pointer-events: none;
+            animation: swimFish linear infinite;
+            font-size: 2.2rem;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-b from-sky-950 via-blue-900 to-indigo-950 text-white min-h-screen relative">
+
+    <!-- Fireworks Canvas Layer -->
+    <canvas id="fireworksCanvas" class="absolute inset-0 z-10 pointer-events-none w-full h-full"></canvas>
+
+    <!-- Ocean Background Elements (Bubbles & Fish) -->
+    <div id="ocean-bg" class="absolute inset-0 overflow-hidden z-0 pointer-events-none">
+        <!-- Bubbles will be generated via JS -->
+        <div class="swimming-fish" style="top: 12%; animation-duration: 18s; animation-delay: 0s;">🐠</div>
+        <div class="swimming-fish" style="top: 40%; animation-duration: 25s; animation-delay: 5s;">🐟</div>
+        <div class="swimming-fish" style="top: 68%; animation-duration: 20s; animation-delay: 2s;">🐡</div>
+        <div class="swimming-fish" style="top: 85%; animation-duration: 30s; animation-delay: 10s;">🐳</div>
+        <div class="swimming-fish" style="top: 28%; animation-duration: 22s; animation-delay: 12s;">🦈</div>
+    </div>
+
+    <!-- Main Container -->
+    <main class="relative z-10 max-w-4xl mx-auto px-4 py-10 flex flex-col items-center gap-10">
+
+        <!-- Header Section -->
+        <header class="text-center space-y-4 bg-white/10 backdrop-blur-md p-6 sm:p-8 rounded-3xl shadow-2xl border border-white/20 w-full">
+            <span class="bg-cyan-500/30 text-cyan-300 text-sm px-4 py-1 rounded-full border border-cyan-400/30 inline-block">🌊 환영합니다! 바닷속 랜선 공간 🌊</span>
+            <h1 class="text-4xl sm:text-6xl font-bold tracking-wide text-cyan-200 drop-shadow-lg">
+                안녕하세요! <span class="text-yellow-300">종결예성</span>입니다.
+            </h1>
+            <p class="text-base sm:text-lg text-sky-200 max-w-xl mx-auto">
+                시원한 바닷속 감성과 재미가 가득한 저의 아지트에 오신 것을 환영해요. 아래에서 저의 최애 취향과 퀴즈를 즐겨보세요!
+            </p>
+
+            <!-- Visitor Greeting Input -->
+            <div class="mt-6 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-center gap-3">
+                <input type="text" id="visitorName" placeholder="방문자님의 이름을 입력해주세요!" 
+                    class="px-4 py-3 rounded-xl bg-black/40 border border-cyan-500/50 text-white placeholder-sky-400 focus:outline-none focus:ring-2 focus:ring-cyan-400 w-full sm:w-72 text-center sm:text-left">
+                <button onclick="greetVisitor()" 
+                    class="bg-cyan-500 hover:bg-cyan-400 text-sky-950 font-bold px-6 py-3 rounded-xl shadow-lg transition-transform transform active:scale-95 w-full sm:w-auto">
+                    환영 인사 받기 ✨
+                </button>
+            </div>
+            <div id="greetingResult" class="text-lg sm:text-xl text-yellow-300 font-semibold mt-3 min-h-[30px]"></div>
+        </header>
+
+        <!-- Favorite Things Section (Cards) -->
+        <section class="w-full space-y-6">
+            <h2 class="text-2xl sm:text-3xl font-bold text-center text-cyan-300">🏎️ 종결예성이 좋아하는 것 3가지</h2>
+            <p class="text-center text-sky-300 text-sm">카드를 클릭(터치)하면 숨겨진 재밌는 이유가 나와요!</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                
+                <!-- Card 1: Car -->
+                <div class="perspective-1000 h-64 cursor-pointer" onclick="flipCard(this)">
+                    <div class="transform-style-3d relative w-full h-full rounded-2xl shadow-xl">
+                        <!-- Front -->
+                        <div class="backface-hidden absolute inset-0 bg-gradient-to-br from-blue-800 to-indigo-900 border border-cyan-500/30 rounded-2xl flex flex-col items-center justify-center p-6 text-center shadow-lg">
+                            <span class="text-6xl mb-3">🚗</span>
+                            <h3 class="text-2xl font-bold text-yellow-300">자동차</h3>
+                            <p class="text-sm text-sky-200 mt-2">클릭해서 이유 확인하기 👉</p>
+                        </div>
+                        <!-- Back -->
+                        <div class="backface-hidden absolute inset-0 bg-gradient-to-br from-indigo-900 to-sky-900 border border-yellow-400/50 rounded-2xl flex flex-col items-center justify-center p-6 text-center rotate-y-180 shadow-lg">
+                            <h3 class="text-xl font-bold text-yellow-300 mb-2">🚗 자동차</h3>
+                            <p class="text-sm text-sky-100 leading-relaxed">
+                                "차가 꽉 막힐 때 창밖을 보며 깊은 사색에 잠기기 딱 좋아서요! (사실 마트 주차장에서 출구를 못 찾아서 갇힌 적 있음)"
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2: Bicycle -->
+                <div class="perspective-1000 h-64 cursor-pointer" onclick="flipCard(this)">
+                    <div class="transform-style-3d relative w-full h-full rounded-2xl shadow-xl">
+                        <!-- Front -->
+                        <div class="backface-hidden absolute inset-0 bg-gradient-to-br from-blue-800 to-indigo-900 border border-cyan-500/30 rounded-2xl flex flex-col items-center justify-center p-6 text-center shadow-lg">
+                            <span class="text-6xl mb-3">🚲</span>
+                            <h3 class="text-2xl font-bold text-yellow-300">자전거</h3>
+                            <p class="text-sm text-sky-200 mt-2">클릭해서 이유 확인하기 👉</p>
+                        </div>
+                        <!-- Back -->
+                        <div class="backface-hidden absolute inset-0 bg-gradient-to-br from-indigo-900 to-sky-900 border border-yellow-400/50 rounded-2xl flex flex-col items-center justify-center p-6 text-center rotate-y-180 shadow-lg">
+                            <h3 class="text-xl font-bold text-yellow-300 mb-2">🚲 자전거</h3>
+                            <p class="text-sm text-sky-100 leading-relaxed">
+                                "두 바퀴로 느끼는 최고의 해방감! 시원한 강바람을 맞으며 페달을 밝을 때 머릿속엔 오직 '치킨 먹고 싶다' 생각뿐입니다."
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3: Racing -->
+                <div class="perspective-1000 h-64 cursor-pointer" onclick="flipCard(this)">
+                    <div class="transform-style-3d relative w-full h-full rounded-2xl shadow-xl">
+                        <!-- Front -->
+                        <div class="backface-hidden absolute inset-0 bg-gradient-to-br from-blue-800 to-indigo-900 border border-cyan-500/30 rounded-2xl flex flex-col items-center justify-center p-6 text-center shadow-lg">
+                            <span class="text-6xl mb-3">🏎️</span>
+                            <h3 class="text-2xl font-bold text-yellow-300">레이싱</h3>
+                            <p class="text-sm text-sky-200 mt-2">클릭해서 이유 확인하기 👉</p>
+                        </div>
+                        <!-- Back -->
+                        <div class="backface-hidden absolute inset-0 bg-gradient-to-br from-indigo-900 to-sky-900 border border-yellow-400/50 rounded-2xl flex flex-col items-center justify-center p-6 text-center rotate-y-180 shadow-lg">
+                            <h3 class="text-xl font-bold text-yellow-300 mb-2">🏎️ 레이싱</h3>
+                            <p class="text-sm text-sky-100 leading-relaxed">
+                                "심장을 울리는 스피드와 코너링의 쾌감! 현실에선 안전 운전왕이지만 카트라이더와 레이싱 게임에선 트랙을 주름잡는 스피드 레이서!"
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- OX Quiz Section -->
+        <section class="w-full bg-white/10 backdrop-blur-md p-6 sm:p-8 rounded-3xl shadow-2xl border border-white/20 text-center space-y-6">
+            <span class="bg-pink-500/30 text-pink-300 text-sm px-4 py-1 rounded-full border border-pink-400/30 inline-block">🎯 스페셜 이벤트</span>
+            <h2 class="text-2xl sm:text-3xl font-bold text-cyan-200">OX 퀴즈 코너</h2>
+            <div class="text-lg sm:text-xl font-semibold bg-black/30 py-4 px-6 rounded-2xl border border-cyan-500/30 inline-block w-full max-w-md mx-auto">
+                "나는 잘생겼다"
+            </div>
+            
+            <div class="flex justify-center gap-6 pt-2">
+                <button onclick="checkQuiz('O')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold text-2xl w-24 py-4 rounded-2xl shadow-lg transition-transform transform active:scale-95 border border-blue-400">
+                    O
+                </button>
+                <button onclick="checkQuiz('X')" class="bg-rose-600 hover:bg-rose-500 text-white font-bold text-2xl w-24 py-4 rounded-2xl shadow-lg transition-transform transform active:scale-95 border border-rose-400">
+                    X
+                </button>
+            </div>
+
+            <div id="quizResult" class="text-lg sm:text-xl font-bold mt-4 min-h-[40px] transition-all"></div>
+        </section>
+
+        <!-- Random Lunch Menu Recommendation Section -->
+        <section class="w-full bg-white/10 backdrop-blur-md p-6 sm:p-8 rounded-3xl shadow-2xl border border-white/20 text-center space-y-6">
+            <span class="bg-yellow-500/30 text-yellow-300 text-sm px-4 py-1 rounded-full border border-yellow-400/30 inline-block">🍽️ 결정 장애 해결</span>
+            <h2 class="text-2xl sm:text-3xl font-bold text-cyan-200">오늘의 점심 메뉴 추천</h2>
+            <p class="text-sky-300 text-sm">메뉴 고르기 힘들 때 버튼을 눌러보세요! (15가지 맛있는 메뉴 대기 중)</p>
+            
+            <div id="menuDisplay" class="text-xl sm:text-3xl font-bold text-yellow-300 bg-black/40 py-6 px-4 rounded-2xl border border-cyan-500/30 min-h-[90px] flex items-center justify-center">
+                버튼을 눌러 메뉴를 뽑아주세요! 🍲
+            </div>
+
+            <button onclick="pickRandomMenu()" class="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-sky-950 font-bold text-base sm:text-lg px-8 py-4 rounded-2xl shadow-lg transition-transform transform active:scale-95">
+                랜덤 메뉴 뽑기 🎲
+            </button>
+        </section>
+
+        <!-- Footer -->
+        <footer class="text-center text-sky-400/70 text-sm pb-8">
+            <p>© 종결예성의 바닷속 랜선 공간 🌊</p>
+        </footer>
+
+    </main>
+
+    <!-- JavaScript -->
+    <script>
+        // 1. Generate Bubbles Dynamically
+        const oceanBg = document.getElementById('ocean-bg');
+        for (let i = 0; i < 20; i++) {
+            const bubble = document.createElement('div');
+            bubble.classList.add('bubble');
+            const size = Math.random() * 24 + 8 + 'px';
+            bubble.style.width = size;
+            bubble.style.height = size;
+            bubble.style.left = Math.random() * 100 + '%';
+            bubble.style.animationDuration = (Math.random() * 8 + 5) + 's';
+            bubble.style.animationDelay = (Math.random() * 5) + 's';
+            oceanBg.appendChild(bubble);
+        }
+
+        // 2. Card Flip Logic
+        function flipCard(cardElement) {
+            const inner = cardElement.querySelector('.transform-style-3d');
+            const isFlipped = inner.style.transform === 'rotateY(180deg)';
+            inner.style.transform = isFlipped ? 'rotateY(0deg)' : 'rotateY(180deg)';
+        }
+
+        // 3. Visitor Greeting Logic
+        function greetVisitor() {
+            const nameInput = document.getElementById('visitorName').value.trim();
+            const resultDiv = document.getElementById('greetingResult');
+            
+            if (!nameInput) {
+                resultDiv.innerHTML = "⚠️ 이름을 먼저 입력해주세요!";
+                resultDiv.className = "text-lg sm:text-xl text-rose-300 font-semibold mt-3";
+                return;
+            }
+            
+            resultDiv.innerHTML = `🌊 환영합니다, <span class="text-cyan-300 font-bold">${nameInput}</span>님! 종결예성의 바닷속 세상에 오신 것을 환영해요 ✨`;
+            resultDiv.className = "text-lg sm:text-xl text-yellow-300 font-semibold mt-3 animate-pulse";
+        }
+
+        // 4. OX Quiz Logic
+        function checkQuiz(answer) {
+            const resultDiv = document.getElementById('quizResult');
+            
+            if (answer === 'X') {
+                resultDiv.innerHTML = "🎉 정답입니다! 겸손함까지 겸비한 멋진 종결예성! 👏✨";
+                resultDiv.className = "text-lg sm:text-xl font-bold mt-4 text-emerald-300 animate-bounce";
+            } else {
+                resultDiv.innerHTML = "😅 땡! 정답은 X입니다! (양심상 X이지만 마음만은 훈남...!)";
+                resultDiv.className = "text-lg sm:text-xl font-bold mt-4 text-rose-300";
+            }
+        }
+
+        // 5. Lunch Menu Random Picker (15 options)
+        const lunchMenus = [
+            "🍜 얼큰 국물 라면",
+            "🍲 보글보글 차돌 김치찌개",
+            "🥩 바삭바삭 수제 돈가스",
+            "🍣 신선한 모둠 초밥",
+            "🔥 화끈하고 얼얼한 마라탕",
+            "🍔 육즙 가득 수제 버거",
+            "🥘 매콤달콤 떡볶이와 튀김",
+            "🍖 불향 가득 제육볶음",
+            "🍝 꾸덕한 크림 파스타",
+            "🥣 든든한 뼈해장국",
+            "🍜 시원따뜻한 칼국수",
+            "🍚 싱싱한 회덮밥",
+            "🍗 겉바속촉 치킨",
+            "🍛 매콤 단짠 치킨마요덮밥",
+            "🥟 속이 꽉 찬 만둣국"
+        ];
+
+        // Canvas Fireworks Logic
+        const canvas = document.getElementById('fireworksCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 6 + 2;
+                this.vx = Math.cos(angle) * speed;
+                this.vy = Math.sin(angle) * speed;
+                this.alpha = 1;
+                this.decay = Math.random() * 0.02 + 0.015;
+                this.radius = Math.random() * 3 + 2;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vy += 0.05; // gravity
+                this.alpha -= this.decay;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = Math.max(0, this.alpha);
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.color;
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        function createFirework(x, y) {
+            const colors = ['#fde047', '#38bdf8', '#f43f5e', '#a855f7', '#34d399', '#fb923c'];
+            const count = 40;
+            for (let i = 0; i < count; i++) {
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                particles.push(new Particle(x, y, color));
+            }
+        }
+
+        function animateFireworks() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.update();
+                p.draw();
+                if (p.alpha <= 0) {
+                    particles.splice(i, 1);
+                }
+            }
+            requestAnimationFrame(animateFireworks);
+        }
+        animateFireworks();
+
+        function triggerFireworksEffect() {
+            const width = canvas.width;
+            const height = canvas.height;
+            // Launch multiple fireworks over time
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    const x = Math.random() * (width * 0.8) + (width * 0.1);
+                    const y = Math.random() * (height * 0.4) + (height * 0.2);
+                    createFirework(x, y);
+                }, i * 200);
+            }
+        }
+
+        function pickRandomMenu() {
+            const display = document.getElementById('menuDisplay');
+            display.classList.add('scale-105', 'text-cyan-300');
+            
+            let count = 0;
+            const slotInterval = setInterval(() => {
+                const randomIndex = Math.floor(Math.random() * lunchMenus.length);
+                display.innerHTML = lunchMenus[randomIndex];
+                count++;
+                if (count > 12) {
+                    clearInterval(slotInterval);
+                    const finalIndex = Math.floor(Math.random() * lunchMenus.length);
+                    display.innerHTML = `🎉 추천 메뉴: <span class="text-white underline">${lunchMenus[finalIndex]}</span> 🎉`;
+                    display.classList.remove('scale-105', 'text-cyan-300');
+                    triggerFireworksEffect(); // Trigger fireworks animation
+                }
+            }, 60);
+        }
+    </script>
+</body>
+</html>
